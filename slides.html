@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lab 07 · Data Foundations</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@400;500;600;700;800&display=swap');
+    :root { --bg:#f7faff; --bg-2:#eaf2ff; --panel:#ffffff; --panel-2:#eef5ff; --line:#cbd9ec; --ink:#13213a; --muted:#5d6d86; --blue:#1d4ed8; --blue-2:#2563eb; --green:#047857; --orange:#c2410c; --red:#be123c; }
+    * { box-sizing:border-box; }
+    html,body { width:100%; height:100%; margin:0; overflow:hidden; background:var(--bg); color:var(--ink); font-family:"Fira Sans",system-ui,sans-serif; }
+    body { line-height:1.45; }
+    button,a { font:inherit; }
+    button { cursor:pointer; }
+    button:focus-visible,a:focus-visible,iframe:focus-visible { outline:3px solid var(--orange); outline-offset:3px; }
+    .deck { position:relative; width:100%; height:100%; overflow:hidden; background:radial-gradient(circle at 82% 7%,rgba(37,99,235,.13),transparent 31%),linear-gradient(135deg,var(--bg),var(--bg-2)); }
+    .deck::before { content:""; position:absolute; inset:0; opacity:.55; pointer-events:none; background-image:linear-gradient(rgba(37,99,235,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(37,99,235,.07) 1px,transparent 1px); background-size:48px 48px; mask-image:linear-gradient(to bottom,black,transparent 82%); }
+    .slide { position:absolute; inset:0; display:grid; grid-template-rows:auto 1fr auto; padding:clamp(24px,4vw,56px) clamp(24px,7vw,112px) 24px; opacity:0; visibility:hidden; transform:translateX(28px); transition:opacity .28s ease,transform .28s ease,visibility .28s; }
+    .slide.active { opacity:1; visibility:visible; transform:translateX(0); z-index:2; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:24px; color:var(--muted); font-family:"Fira Code",monospace; font-size:12px; letter-spacing:.08em; text-transform:uppercase; }
+    .brand { display:inline-flex; align-items:center; gap:10px; color:var(--ink); font-weight:700; letter-spacing:0; text-decoration:none; text-transform:none; }
+    .brand-mark { display:grid; place-items:center; width:30px; height:30px; border:1px solid rgba(37,99,235,.28); border-radius:9px; background:#e5efff; color:var(--blue); }
+    .brand-mark svg { width:17px; height:17px; }
+    .content { display:flex; flex-direction:column; justify-content:center; min-height:0; padding:24px 0 20px; }
+    .eyebrow { display:inline-flex; align-items:center; gap:9px; color:var(--blue); font-family:"Fira Code",monospace; font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; }
+    .eyebrow::before { content:""; width:26px; height:2px; background:var(--blue); }
+    h1,h2,h3,p { margin-top:0; }
+    h1 { max-width:900px; margin-bottom:20px; font-size:clamp(42px,7vw,92px); line-height:.98; letter-spacing:-.065em; }
+    h2 { margin-bottom:12px; font-size:clamp(32px,4.5vw,62px); line-height:1.02; letter-spacing:-.05em; }
+    h3 { margin-bottom:8px; font-size:18px; }
+    .lede { max-width:720px; margin-bottom:28px; color:var(--muted); font-size:clamp(18px,2vw,24px); }
+    .mono { font-family:"Fira Code",monospace; }
+    .accent { color:var(--blue); }
+    .green { color:var(--green); }
+    .orange { color:var(--orange); }
+    .meta-row { display:flex; flex-wrap:wrap; gap:9px; }
+    .tag { display:inline-flex; align-items:center; min-height:32px; padding:5px 11px; border:1px solid var(--line); border-radius:999px; background:rgba(255,255,255,.84); color:var(--muted); font-family:"Fira Code",monospace; font-size:12px; box-shadow:0 5px 14px rgba(37,99,235,.06); }
+    .tag.blue { border-color:#a8c4f5; color:var(--blue); }
+    .tag.green { border-color:#9ed9c7; color:var(--green); }
+    .tag.orange { border-color:#f1c49d; color:var(--orange); }
+    .footer { display:flex; align-items:center; justify-content:space-between; gap:20px; color:var(--muted); font-size:12px; }
+    .hint { font-family:"Fira Code",monospace; }
+    .progress { position:absolute; right:clamp(24px,7vw,112px); bottom:0; left:clamp(24px,7vw,112px); height:3px; overflow:hidden; background:rgba(19,33,58,.12); }
+    .progress span { display:block; width:12.5%; height:100%; background:var(--blue); transition:width .28s ease; }
+    .nav-button { position:fixed; top:50%; z-index:8; display:grid; place-items:center; width:48px; height:48px; border:1px solid var(--line); border-radius:50%; background:rgba(255,255,255,.9); color:var(--ink); box-shadow:0 10px 25px rgba(37,99,235,.15); backdrop-filter:blur(10px); transform:translateY(-50%); transition:background .2s ease,border-color .2s ease,transform .2s ease; }
+    .nav-button:hover { border-color:var(--blue); background:var(--panel-2); transform:translateY(-50%) scale(1.05); }
+    .nav-button svg { width:19px; height:19px; }
+    #previous { left:20px; }
+    #next { right:20px; }
+    .nav-zone { position:fixed; top:0; bottom:0; z-index:4; width:12%; cursor:pointer; }
+    #previous-zone { left:0; }
+    #next-zone { right:0; }
+    .two-col { display:grid; grid-template-columns:1.05fr .95fr; gap:28px; align-items:stretch; }
+    .cards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .card { min-width:0; padding:20px; border:1px solid var(--line); border-radius:16px; background:linear-gradient(145deg,#ffffff,#f3f7ff); box-shadow:0 16px 40px rgba(37,99,235,.09); }
+    .card p { margin-bottom:0; color:var(--muted); font-size:14px; }
+    .card strong { display:block; margin-bottom:7px; color:var(--ink); font-size:16px; }
+    .number { color:var(--blue); font-family:"Fira Code",monospace; font-size:13px; }
+    .callout { padding:22px; border-left:3px solid var(--orange); background:#fff7ed; color:var(--muted); }
+    .callout strong { color:var(--orange); }
+    .code-card { overflow:hidden; border:1px solid var(--line); border-radius:16px; background:#f5f9ff; box-shadow:0 18px 50px rgba(37,99,235,.12); }
+    .code-bar { display:flex; align-items:center; gap:6px; padding:11px 14px; border-bottom:1px solid var(--line); color:var(--muted); font-family:"Fira Code",monospace; font-size:11px; }
+    .dot { width:8px; height:8px; border-radius:50%; background:var(--red); }
+    .dot:nth-child(2) { background:var(--orange); }
+    .dot:nth-child(3) { background:var(--green); }
+    pre { margin:0; padding:20px; overflow:auto; color:#1e3a5f; font-family:"Fira Code",monospace; font-size:clamp(11px,1.2vw,14px); line-height:1.7; }
+    .key { color:#1d4ed8; }
+    .value { color:#047857; }
+    .comment { color:#64748b; }
+    .pipeline { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px; align-items:stretch; margin:22px 0 18px; }
+    .step { position:relative; padding:18px 14px; border:1px solid var(--line); border-radius:14px; background:var(--panel); box-shadow:0 12px 28px rgba(37,99,235,.07); }
+    .step:not(:last-child)::after { content:"→"; position:absolute; top:50%; right:-15px; z-index:1; color:var(--blue); font-size:21px; transform:translateY(-50%); }
+    .step-no { display:block; margin-bottom:18px; color:var(--blue); font-family:"Fira Code",monospace; font-size:12px; }
+    .step strong { display:block; margin-bottom:5px; font-size:15px; }
+    .step span { display:block; color:var(--muted); font-size:12px; }
+    .small-note { color:var(--muted); font-size:14px; }
+    .metric-row { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-bottom:22px; }
+    .metric { padding:17px 18px; border:1px solid var(--line); border-radius:14px; background:linear-gradient(145deg,#ffffff,#f3f7ff); box-shadow:0 10px 24px rgba(37,99,235,.06); }
+    .metric b { display:block; color:var(--green); font-family:"Fira Code",monospace; font-size:26px; }
+    .metric span { display:block; margin-top:4px; color:var(--muted); font-size:12px; }
+    .table-wrap { overflow:hidden; border:1px solid var(--line); border-radius:16px; background:var(--panel); box-shadow:0 14px 32px rgba(37,99,235,.08); }
+    table { width:100%; border-collapse:collapse; font-size:14px; }
+    th,td { padding:13px 16px; border-bottom:1px solid #dbe7f5; text-align:left; }
+    th { color:var(--blue); font-family:"Fira Code",monospace; font-size:11px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; }
+    td { color:var(--muted); }
+    td:first-child { color:var(--ink); font-weight:700; }
+    tbody tr:nth-child(even) td { background:#f8fbff; }
+    tr:last-child td { border-bottom:0; }
+    .result { display:inline-flex; align-items:center; gap:6px; color:var(--green); font-family:"Fira Code",monospace; font-size:12px; }
+    .result::before { content:"✓"; display:grid; place-items:center; width:17px; height:17px; border-radius:50%; background:#d9f5eb; }
+    .callout p:last-child,.callout ul:last-child { margin-bottom:0; }
+    .callout ul { margin:12px 0 0; padding-left:20px; }
+    .callout li + li { margin-top:6px; }
+    .checklist { display:grid; gap:10px; padding:18px; border:1px solid var(--line); border-radius:16px; background:linear-gradient(145deg,#ffffff,#f3f7ff); box-shadow:0 14px 32px rgba(37,99,235,.08); }
+    .check { display:flex; align-items:flex-start; gap:10px; color:var(--muted); font-size:14px; }
+    .check::before { content:"✓"; display:grid; flex:0 0 20px; place-items:center; width:20px; height:20px; border-radius:50%; background:#d9f5eb; color:var(--green); font-weight:800; }
+    .check strong { color:var(--ink); }
+    .query-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:11px; margin-top:16px; }
+    .query-card { display:grid; grid-template-columns:34px 1fr; gap:11px; min-width:0; padding:14px 15px; border:1px solid var(--line); border-radius:14px; background:linear-gradient(145deg,#ffffff,#f3f7ff); box-shadow:0 10px 24px rgba(37,99,235,.06); }
+    .query-card:last-child { grid-column:1 / -1; }
+    .query-no { display:grid; place-items:center; width:30px; height:30px; border-radius:9px; background:#e5efff; color:var(--blue); font-family:"Fira Code",monospace; font-size:12px; font-weight:700; }
+    .query-card p { margin:0; color:var(--ink); font-size:14px; line-height:1.4; }
+    .query-card small { display:block; margin-top:7px; color:var(--green); font-family:"Fira Code",monospace; font-size:11px; }
+    .ui-slide { display:block; padding:0; background:#f8fafc; }
+    .ui-slide .topbar { position:relative; z-index:5; margin:24px clamp(24px,7vw,112px) 0; padding:10px 14px; border:1px solid rgba(203,217,236,.9); border-radius:12px; background:rgba(255,255,255,.84); box-shadow:0 10px 25px rgba(37,99,235,.12); backdrop-filter:blur(12px); pointer-events:none; }
+    .ui-slide .content { position:absolute; inset:0; z-index:1; display:block; padding:0; }
+    .ui-slide .footer { position:absolute; right:clamp(24px,7vw,112px); bottom:14px; left:clamp(24px,7vw,112px); z-index:5; padding:8px 14px; border:1px solid rgba(203,217,236,.9); border-radius:10px; background:rgba(255,255,255,.84); box-shadow:0 10px 25px rgba(37,99,235,.1); backdrop-filter:blur(12px); pointer-events:none; }
+    .ui-slide .topbar,.ui-slide .footer { display:none; }
+    .ui-frame { width:100%; height:100%; min-height:0; overflow:hidden; border:0; border-radius:0; background:#f8fafc; box-shadow:none; }
+    .ui-frame iframe { display:block; width:100%; height:100%; border:0; background:#f8fafc; }
+    .ui-fallback { display:none; padding:24px; color:#172033; }
+    .ui-fallback code { padding:4px 7px; border-radius:5px; background:#e8eef5; }
+    .slide:not(.active) iframe { pointer-events:none; }
+    @media (max-width:900px) {
+      .slide { padding:24px 54px 18px; }
+      .progress { right:54px; left:54px; }
+      .two-col { grid-template-columns:1fr; }
+      .pipeline { grid-template-columns:repeat(5,minmax(115px,1fr)); overflow-x:auto; padding-bottom:8px; }
+      .step:not(:last-child)::after { display:none; }
+      .ui-frame { height:clamp(380px,62vh,600px); }
+    }
+    @media (max-width:620px) {
+      .slide { padding:18px 20px 16px; }
+      .topbar { font-size:10px; }
+      .brand small { display:none; }
+      .content { padding:15px 0; }
+      h1 { font-size:clamp(38px,12vw,58px); }
+      h2 { font-size:34px; }
+      .cards,.metric-row,.query-grid { grid-template-columns:1fr; }
+      .query-card:last-child { grid-column:auto; }
+      .two-col { gap:14px; }
+      .card { padding:16px; }
+      .table-wrap { overflow-x:auto; }
+      table { min-width:600px; }
+      .nav-button { width:42px; height:42px; }
+      #previous { left:8px; }
+      #next { right:8px; }
+      .nav-zone { width:16%; }
+      .ui-frame { height:calc(100vh - 150px); min-height:360px; }
+    }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none!important; scroll-behavior:auto!important; } }
+  </style>
+</head>
+<body>
+  <main class="deck" aria-label="Slide thuyết trình Lab 07">
+    <section class="slide active" data-title="Mở đầu">
+      <div class="topbar"><a class="brand" href="#" aria-label="Trang đầu"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 5.5v16M8 7h8M8 11h8"/></svg></span><span>PolicyLens <small>/ Lab 07</small></span></a><span>01 / 08</span></div>
+      <div class="content"><span class="eyebrow">Data Foundations · Retrieval Lab</span><h1>Tra cứu chính sách có <span class="accent">nguồn kiểm chứng.</span></h1><p class="lede">Từ corpus chính sách thương mại điện tử đến embedding, vector store và grounded Agent answer — mọi câu trả lời đều phải truy vết được về nguồn.</p><div class="meta-row"><span class="tag blue">7 documents</span><span class="tag green">4 chunking strategies</span><span class="tag orange">5 benchmark queries</span><span class="tag">Gemini embedding</span></div><div class="callout" style="max-width:760px;margin-top:24px"><strong>Thông điệp của lab:</strong> retrieval tốt không chỉ trả lời đúng; nó còn cho biết câu trả lời đến từ chunk nào, tài liệu nào và source nào.</div></div>
+      <div class="footer"><span class="hint">PolicyLens · K4-L3B</span><span class="hint">Click hoặc ← → để chuyển slide</span></div>
+    </section>
+
+    <section class="slide" data-title="Mục tiêu">
+      <div class="topbar"><span class="brand">01 · Vì sao làm lab này?</span><span>02 / 08</span></div>
+      <div class="content"><span class="eyebrow">Mục tiêu</span><h2>Không chỉ hỏi được.<br><span class="accent">Phải truy vết được.</span></h2><div class="two-col"><div class="cards"><article class="card"><span class="number">01</span><strong>Chunking</strong><p>Chia document thành các đơn vị có nghĩa để retrieval giữ được ngữ cảnh.</p></article><article class="card"><span class="number">02</span><strong>Embedding &amp; Vector store</strong><p>Biểu diễn văn bản thành vector, search bằng cosine similarity và metadata filter.</p></article><article class="card"><span class="number">03</span><strong>RAG Agent</strong><p>Chỉ sinh Agent answer từ các chunks đã retrieve, không tự bịa ngoài evidence.</p></article><article class="card"><span class="number">04</span><strong>Evaluation</strong><p>So sánh top-k, chunk coherence, grounding và failure cases qua benchmark.</p></article></div><div class="callout"><strong>Lab gồm 2 Phase</strong><ul><li>Phase 1: hoàn thành core implementation trong <span class="mono">src/</span>.</li><li>Phase 2: chọn corpus, chạy 5 benchmark queries và so sánh strategy.</li><li>Deliverable: code, report, benchmark và demo UI/UX.</li></ul></div></div></div>
+      <div class="footer"><span class="hint">Core implementation + group strategy</span><span class="hint">← →</span></div>
+    </section>
+
+    <section class="slide" data-title="Data">
+      <div class="topbar"><span class="brand">02 · Corpus &amp; Metadata</span><span>03 / 08</span></div>
+      <div class="content"><span class="eyebrow">Data foundation</span><h2>Corpus public từ Shopee, có <span class="accent">provenance</span> rõ ràng.</h2><p class="small-note">Nguồn chính: Shopee Help Center và Shopee Đảm Bảo. Nội dung được chuyển thành Markdown trong <span class="mono">data/ecommerce/</span>.</p><div class="two-col"><div><div class="metric-row"><div class="metric"><b>07</b><span>documents `.md`</span></div><div class="metric"><b>05</b><span>official Shopee URLs</span></div><div class="metric"><b>02</b><span>audience: buyer / seller</span></div></div><div class="card"><strong>Metadata được giữ trên từng chunk</strong><p class="mono">doc_id · title · audience · category · language<br>source_url · retrieved_at · document_version</p></div><div class="callout" style="margin-top:14px;padding:16px 18px"><strong>Data quality:</strong> nội dung được chuẩn hóa về Markdown, giữ source URL và tách rõ ngữ cảnh buyer/seller để filter trước retrieval.</div></div><div class="code-card"><div class="code-bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span>buyer-return-window.md</span></div><pre><span class="key">doc_id:</span> <span class="value">buyer-return-window</span>
+<span class="key">audience:</span> <span class="value">buyer</span>
+<span class="key">category:</span> <span class="value">returns-deadline</span>
+<span class="key">source_url:</span> <span class="value">Shopee Help Center</span>
+<span class="key">retrieved_at:</span> <span class="value">2026-09-19</span>
+<span class="key">document_version:</span> <span class="value">v1</span></pre></div></div></div>
+      <div class="footer"><span class="hint">data/ecommerce/ + sources.csv</span><span class="hint">← →</span></div>
+    </section>
+
+    <section class="slide" data-title="Lab checklist">
+      <div class="topbar"><span class="brand">03 · Lab checklist</span><span>04 / 08</span></div>
+      <div class="content"><span class="eyebrow">Requirements → implementation</span><h2>Đối chiếu yêu cầu của Lab với <span class="accent">phần đã làm.</span></h2><div class="two-col"><div class="cards"><article class="card"><span class="number">01</span><strong>Core implementation</strong><p>Hoàn thành Sentence, Recursive, similarity, EmbeddingStore và KnowledgeBaseAgent trong <span class="mono">src/</span>.</p></article><article class="card"><span class="number">02</span><strong>Corpus 5–10 documents</strong><p>Chuẩn bị 7 documents về đổi trả và bảo hành, có cả ngữ cảnh buyer và seller.</p></article><article class="card"><span class="number">03</span><strong>Metadata filtering</strong><p>Mỗi document có <span class="mono">audience</span>, category, language, source và version.</p></article><article class="card"><span class="number">04</span><strong>Strategy comparison</strong><p>Thử Fixed-size, Sentence, Recursive và Heading-aware trên cùng bộ queries.</p></article></div><div class="checklist"><div class="check"><span><strong>Đúng 5 benchmark queries</strong><br>mỗi câu có gold answer và gold chunk.</span></div><div class="check"><span><strong>Ít nhất một query dùng metadata filter</strong><br>buyer/seller để loại evidence sai đối tượng.</span></div><div class="check"><span><strong>Grounded answer</strong><br>Agent chỉ trả lời từ retrieved evidence.</span></div><div class="check"><span><strong>Demo &amp; report</strong><br>có benchmark metrics, source URL và UI/UX trình bày.</span></div></div></div></div>
+      <div class="footer"><span class="hint">K4_VARIANT.md · REPORT_NHOM.md</span><span class="hint">← →</span></div>
+    </section>
+
+    <section class="slide" data-title="Pipeline">
+      <div class="topbar"><span class="brand">04 · End-to-end pipeline</span><span>05 / 08</span></div>
+      <div class="content"><span class="eyebrow">From data to evidence</span><h2>Mỗi bước tạo ra một lớp <span class="green">kiểm chứng.</span></h2><div class="pipeline"><article class="step"><span class="step-no">01</span><strong>Documents</strong><span>Clean Markdown + metadata</span></article><article class="step"><span class="step-no">02</span><strong>Chunking</strong><span>Fixed-size / Sentence / Recursive / Heading-aware</span></article><article class="step"><span class="step-no">03</span><strong>Embedding</strong><span>Gemini vector representation</span></article><article class="step"><span class="step-no">04</span><strong>Vector store</strong><span>Cosine search + metadata filter</span></article><article class="step"><span class="step-no">05</span><strong>RAG Agent</strong><span>Grounded answer + source citations</span></article></div><div class="callout"><strong>Demo logic:</strong> Query → retrieve top-k chunks → Agent answer → đối chiếu evidence → mở source chính thức.</div><div class="meta-row" style="margin-top:16px"><span class="tag blue">question</span><span class="tag">strategy</span><span class="tag">audience filter</span><span class="tag green">top-k evidence</span><span class="tag orange">grounded answer</span></div></div>
+      <div class="footer"><span class="hint">EmbeddingStore · KnowledgeBaseAgent</span><span class="hint">← →</span></div>
+    </section>
+
+    <section class="slide" data-title="Benchmark queries">
+      <div class="topbar"><span class="brand">05 · Benchmark queries</span><span>06 / 08</span></div>
+      <div class="content"><span class="eyebrow">Shared evaluation set</span><h2>Năm câu hỏi, năm tình huống <span class="accent">có thể kiểm chứng.</span></h2><p class="small-note">Mỗi query đi kèm audience filter, gold answer và document/chunk kỳ vọng để mọi strategy được chạy trên cùng một chuẩn.</p><div class="query-grid"><article class="query-card"><span class="query-no">Q1</span><p>Trong bao lâu người mua có thể yêu cầu trả hàng hoặc hoàn tiền?<small>buyer · gold: 15 ngày · buyer-return-window#0</small></p></article><article class="query-card"><span class="query-no">Q2</span><p>Người bán phải phản hồi yêu cầu trả hàng trong bao lâu?<small>seller · gold: 02 ngày lịch · seller-return-response#0</small></p></article><article class="query-card"><span class="query-no">Q3</span><p>Nếu yêu cầu được chấp nhận thì tiền hoàn thường được chuyển trong bao lâu?<small>buyer · gold: 1–14 ngày làm việc · refund-request-process#1</small></p></article><article class="query-card"><span class="query-no">Q4</span><p>Các điều kiện cơ bản để được bảo hành là gì?<small>buyer · gold: còn hạn, tem/phiếu, lỗi hợp lệ · warranty-conditions#0</small></p></article><article class="query-card"><span class="query-no">Q5</span><p>Trong một số trường hợp, ai chịu chi phí vận chuyển chiều hoàn trả?<small>seller · gold: người bán chịu · return-shipping-costs#0</small></p></article></div><div class="callout" style="margin-top:16px"><strong>Cách chấm:</strong> top-3 phải chứa evidence liên quan và Agent answer phải khớp với gold answer; điểm score chỉ là tín hiệu hỗ trợ, không thay thế kiểm chứng nội dung.</div></div>
+      <div class="footer"><span class="hint">bench.py · report/REPORT_NHOM.md</span><span class="hint">← →</span></div>
+    </section>
+
+    <section class="slide" data-title="Benchmark">
+      <div class="topbar"><span class="brand">06 · Benchmark result</span><span>07 / 08</span></div>
+      <div class="content"><span class="eyebrow">Semantic retrieval</span><h2>Cả bốn strategy đều đạt <span class="green">5/5 top-1.</span></h2><p class="small-note">Gemini embedding · 5 benchmark queries · top-k đánh giá = 3 · corpus 7 documents</p><div class="table-wrap"><table><thead><tr><th>Strategy</th><th>Chunks</th><th>Avg length</th><th>Gold top-1</th><th>Gold top-3</th></tr></thead><tbody><tr><td>Fixed-size</td><td class="mono">15</td><td class="mono">276.5</td><td><span class="result">5 / 5</span></td><td><span class="result">5 / 5</span></td></tr><tr><td>Sentence</td><td class="mono">16</td><td class="mono">234.1</td><td><span class="result">5 / 5</span></td><td><span class="result">5 / 5</span></td></tr><tr><td>Recursive</td><td class="mono">16</td><td class="mono">234.1</td><td><span class="result">5 / 5</span></td><td><span class="result">5 / 5</span></td></tr><tr><td>Heading-aware</td><td class="mono">16</td><td class="mono">256.1</td><td><span class="result">5 / 5</span></td><td><span class="result">5 / 5</span></td></tr></tbody></table></div><div class="callout" style="margin-top:18px"><strong>Đọc kết quả đúng cách:</strong><ul><li>Trong corpus nhỏ này, cả bốn strategy đều retrieve đúng gold document ở top-1 và top-3.</li><li>Fixed-size tạo chunk dài hơn; Sentence/Recursive tạo chunk ngắn hơn và dễ đọc hơn.</li><li>Chưa thể kết luận strategy tốt nhất nếu chưa đo coherence, latency và failure cases trên corpus lớn hơn.</li></ul></div></div>
+      <div class="footer"><span class="hint">report/BENCHMARK_GEMINI.md</span><span class="hint">← →</span></div>
+    </section>
+
+    <section class="slide ui-slide" data-title="Live demo">
+      <div class="topbar"><span class="brand">07 · Live demo</span><span>08 / 08</span></div>
+      <div class="content"><div class="ui-frame"><iframe title="PolicyLens live demo" src="/"></iframe><div class="ui-fallback">Không kết nối được UI. Chạy <code>.venv/bin/python ui_demo.py</code>, sau đó reload slide.</div></div></div>
+      <div class="footer"><span class="hint">Live UI · cùng origin</span><span class="hint">← để quay lại benchmark</span></div>
+    </section>
+
+    <button id="previous" class="nav-button" type="button" aria-label="Slide trước"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+    <button id="next" class="nav-button" type="button" aria-label="Slide tiếp theo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+    <div id="previous-zone" class="nav-zone" aria-hidden="true"></div><div id="next-zone" class="nav-zone" aria-hidden="true"></div>
+    <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+  </main>
+  <script>
+    const slides = [...document.querySelectorAll('.slide')];
+    const progress = document.getElementById('progress-bar');
+    let current = 0;
+    const show = (index, syncUrl = true) => { current = Math.max(0, Math.min(slides.length - 1, index)); slides.forEach((slide, i) => slide.classList.toggle('active', i === current)); progress.style.width = `${((current + 1) / slides.length) * 100}%`; document.title = `${String(current + 1).padStart(2, '0')} · ${slides[current].dataset.title} · Lab 07`; if (syncUrl) history.replaceState(null, '', `#slide-${current + 1}`); };
+    const next = () => show(current + 1);
+    const previous = () => show(current - 1);
+    document.getElementById('next').addEventListener('click', next);
+    document.getElementById('previous').addEventListener('click', previous);
+    document.getElementById('next-zone').addEventListener('click', next);
+    document.getElementById('previous-zone').addEventListener('click', previous);
+    document.addEventListener('keydown', (event) => { if (['ArrowRight', 'PageDown', ' '].includes(event.key)) { event.preventDefault(); next(); } if (['ArrowLeft', 'PageUp'].includes(event.key)) { event.preventDefault(); previous(); } if (event.key === 'Home') show(0); if (event.key === 'End') show(slides.length - 1); });
+    const hashSlide = Number(window.location.hash.replace('#slide-', ''));
+    show(Number.isInteger(hashSlide) && hashSlide >= 1 && hashSlide <= slides.length ? hashSlide - 1 : 0, false);
+  </script>
+</body>
+</html>

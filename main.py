@@ -19,6 +19,7 @@ from src.embeddings import (
 )
 from src.models import Document
 from src.store import EmbeddingStore
+from src.llm import resolve_llm_from_env
 
 SAMPLE_FILES = [
     "data/python_intro.txt",
@@ -106,6 +107,8 @@ def run_manual_demo(question: str | None = None, sample_files: list[str] | None 
         embedder = _mock_embed
 
     print(f"\nEmbedding backend: {getattr(embedder, '_backend_name', embedder.__class__.__name__)}")
+    llm = resolve_llm_from_env(demo_llm)
+    print(f"LLM backend: {getattr(llm, '_backend_name', llm.__class__.__name__)}")
 
     store = EmbeddingStore(collection_name="manual_test_store", embedding_fn=embedder)
     store.add_documents(docs)
@@ -119,7 +122,7 @@ def run_manual_demo(question: str | None = None, sample_files: list[str] | None 
         print(f"   content preview: {result['content'][:120].replace(chr(10), ' ')}...")
 
     print("\n=== KnowledgeBaseAgent Test ===")
-    agent = KnowledgeBaseAgent(store=store, llm_fn=demo_llm)
+    agent = KnowledgeBaseAgent(store=store, llm_fn=llm)
     print(f"Question: {query}")
     print("Agent answer:")
     print(agent.answer(query, top_k=3))

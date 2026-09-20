@@ -1,18 +1,18 @@
 ---
 doc_id: return-refund-policy
-title: Chính sách đổi trả và hoàn tiền
-audience: buyer               # buyer | seller | both
+title: Những quy định chung về trả hàng và hoàn tiền
+audience: buyer
 category: returns-policy
 language: vi
-source_url: https://example.com/policy/returns
-retrieved_at: 2026-09-18
+source_url: https://help.shopee.vn/portal/4/article/188931-%5BTr%E1%BA%A3-h%C3%A0ng/Ho%C3%A0n-ti%E1%BB%81n%5D-Nh%E1%BB%AFng-quy-%C4%91%E1%BB%8Bnh-chung-v%E1%BB%81-Tr%E1%BA%A3-h%C3%A0ng/Ho%C3%A0n-ti%E1%BB%81n-c%E1%BB%A7a-Shopee
+retrieved_at: 2026-09-19
 document_version: "not-stated"
 ---
 
-> Khối metadata phía trên là **template mẫu** cho K4-L3B (bắt buộc: `audience` + `source_url` + `retrieved_at` + `document_version`, cùng ít nhất một trường hữu ích khác như `category`). Thay bằng nguồn công khai thật của nhóm trước khi dùng làm benchmark.
+# Quy định chung về trả hàng và hoàn tiền
 
-# Chính sách đổi trả và hoàn tiền (dữ liệu khởi động)
+Shopee hiện không hỗ trợ yêu cầu đổi hàng. Nếu sản phẩm có vấn đề như khác mô tả hoặc hư hỏng, người mua có thể từ chối nhận trong trường hợp được đồng kiểm hoặc gửi yêu cầu trả hàng/hoàn tiền sau khi nhận.
 
-Người mua có thể yêu cầu đổi trả trong một khoảng thời gian nhất định kể từ ngày nhận hàng, với điều kiện sản phẩm còn nguyên tem/nhãn và chưa qua sử dụng.
+Các lý do được liệt kê gồm chưa nhận được hàng, thiếu hàng hoặc phụ kiện, giao sai sản phẩm, sản phẩm hư hỏng, không hoạt động, khác mô tả, hàng giả/nhái và một số trường hợp đổi ý khi sản phẩm còn nguyên trạng. Với lý do đổi ý, sản phẩm cần còn nguyên tem, nhãn, bao bì, phụ kiện và quà tặng đi kèm.
 
-Nhóm cần bổ sung thời hạn cụ thể, điều kiện ngoại lệ (hàng giảm giá, hàng dễ hư hỏng) và quy trình hoàn tiền từ nguồn chính thức trước khi dùng làm benchmark.
+Yêu cầu có thể được xử lý trong khoảng 3–5 ngày làm việc. Một số voucher hoặc Shop Voucher không được hoàn lại tùy loại khiếu nại và trạng thái hiệu lực.

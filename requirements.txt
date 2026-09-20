@@ -6,5 +6,5 @@ python-dotenv==1.2.2
 # Want a real embedding backend for benchmark quality (optional, not graded)?
 #   Local, free, no API key : pip install -r requirements-local.txt
 #   OpenAI                  : pip install openai
-#   Gemini (free tier)      : pip install google-genai
+#   Gemini (free tier)      : pip install -r requirements-gemini.txt
 # See README.md "Tuy Chon Mo Hinh Nhung" or Phu luc B in the lab doc.

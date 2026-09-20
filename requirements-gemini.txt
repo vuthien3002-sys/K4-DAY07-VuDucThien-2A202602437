@@ -1,0 +1,2 @@
+# Optional Gemini embedding backend for the K4-L3B benchmark and UI demo.
+google-genai==2.24.0

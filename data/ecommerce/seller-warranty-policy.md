@@ -1,18 +1,18 @@
 ---
 doc_id: seller-warranty-policy
-title: Chính sách bảo hành dành cho người bán
-audience: seller               # buyer | seller | both
+title: Trách nhiệm bảo hành của người bán
+audience: seller
 category: warranty-policy
 language: vi
-source_url: https://example.com/policy/seller-warranty
-retrieved_at: 2026-09-18
+source_url: https://help.shopee.vn/portal/4/article/77245
+retrieved_at: 2026-09-19
 document_version: "not-stated"
 ---
 
-> Khối metadata phía trên là **template mẫu** cho K4-L3B — thay `source_url`/`retrieved_at`/`document_version` bằng nguồn công khai thật trước khi dùng làm benchmark.
+# Trách nhiệm bảo hành của người bán
 
-# Chính sách bảo hành dành cho người bán (dữ liệu khởi động)
+Người bán phải tiếp nhận bảo hành cho sản phẩm hoặc dịch vụ theo cam kết của người bán và/hoặc nhà sản xuất. Thông tin về chính sách bảo hành phải được đăng trên Shopee trong phần mô tả sản phẩm.
 
-Người bán chịu trách nhiệm xử lý yêu cầu bảo hành trong một khoảng thời gian quy định, và có thể bị xử phạt nếu từ chối yêu cầu hợp lệ hoặc phản hồi trễ hạn.
+Người mua có quyền yêu cầu bảo hành khi đáp ứng các điều kiện đã công bố. Shopee không trực tiếp thực hiện nghĩa vụ bảo hành cho sản phẩm do người bán đăng bán, ngoại trừ sản phẩm do Shopee trực tiếp bán.
 
-Nhóm cần bổ sung mốc thời gian phản hồi, mức phạt, và quy trình khiếu nại từ nguồn chính thức trước khi dùng làm benchmark.
+Người bán nên công bố rõ thời hạn, điều kiện, địa chỉ hoặc đầu mối tiếp nhận bảo hành để người mua có thể thực hiện quyền của mình.

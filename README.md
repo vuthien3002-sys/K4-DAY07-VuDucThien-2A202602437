@@ -39,7 +39,24 @@ pytest tests/ -v          # Phần lớn bài kiểm thử sẽ THẤT BẠI (ch
 ```
 
 Mặc định, lab vẫn chạy với trình nhúng giả lập `_mock_embed` nên **không bắt buộc** cài đặt mô hình nhúng (embedder) thật.
-File `.env` được tự động nạp khi chạy `main.py`. Với các đoạn mã Python (snippet) chạy trực tiếp, hãy dùng lệnh `export` cho các biến môi trường cần thiết hoặc gọi hàm `load_dotenv()` nếu cần.
+File `.env` được tự động nạp khi chạy `main.py`, `bench.py` hoặc `ui_demo.py`. Hãy copy `.env.example` thành `.env` và không commit API key.
+
+## LLM cho Agent và UI Demo
+
+LLM **không bắt buộc** để chạy TODO hoặc unit test. Agent vẫn nhận `llm_fn` và UI có deterministic mock fallback. Nếu muốn câu trả lời RAG tự nhiên trong demo, chọn một provider trong `.env`:
+
+```bash
+# Gemini
+LLM_PROVIDER=gemini
+GEMINI_API_KEY=your-key-here
+
+# Hoặc OpenRouter
+LLM_PROVIDER=openrouter
+OPENROUTER_API_KEY=your-key-here
+OPENROUTER_MODEL=google/gemini-2.5-flash
+```
+
+Gemini được gọi qua `generateContent`; OpenRouter dùng endpoint `/api/v1/chat/completions`. Nếu thiếu key hoặc để `LLM_PROVIDER=mock`, chương trình tự dùng mock LLM. LLM provider chỉ sinh câu trả lời từ các chunks đã retrieve, không thay thế phần embedding/retrieval.
 
 ## Tùy Chọn Mô Hình Nhúng (Embedding Backend)
 
@@ -89,7 +106,7 @@ export OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 Dùng khi bạn không có OpenAI API key — Gemini API key lấy miễn phí tại [aistudio.google.com](https://aistudio.google.com/apikey), có hạn mức free tier đủ dùng cho lab.
 
 ```bash
-pip install google-genai
+pip install -r requirements-gemini.txt
 export GEMINI_API_KEY=your-key-here
 python3 - <<'PY'
 from src import GeminiEmbedder
@@ -262,3 +279,49 @@ Xem chi tiết tại `docs/SCORING.md`. Tóm tắt:
 ```bash
 pytest tests/ -v
 ```
+
+## Ingest, Benchmark và Demo UI
+
+Lab có thêm pipeline nạp dữ liệu trong `ingest.py`. Pipeline đọc YAML front
+matter, giữ metadata trên từng chunk, rồi nạp các chunk vào `EmbeddingStore`.
+
+Chạy benchmark năm câu hỏi của L3B:
+
+```bash
+python bench.py --all-strategies
+```
+
+Mặc định benchmark dùng mock embedder để chạy offline. Để so sánh semantic có
+ý nghĩa, cài `requirements-local.txt` và đặt `EMBEDDING_PROVIDER=local`.
+
+Chạy demo UI/UX PolicyLens:
+
+```bash
+python ui_demo.py
+```
+
+Mở `http://localhost:8765`. Server chỉ bind vào localhost và tự reload khi bạn
+lưu thay đổi trong `ui_demo.py`, `src/`, `ingest.py`, `bench.py`, `.env` hoặc
+corpus `data/ecommerce/shopee/` (10 chính sách công khai); trình duyệt cũng tự refresh khi giao diện đổi.
+
+Demo gồm:
+
+- Retrieval workspace: Agent answer grounded, top-k evidence, score và metadata/source.
+- Retrieval pipeline: Query → Chunking → Embedding → Vector store → top-k evidence → RAG Agent; kèm giải thích lý do chọn strategy và trade-off.
+- Benchmark chunking: so sánh Fixed-size, Sentence, Recursive và Heading-aware.
+- Comparison result: collection size, top cosine score, top evidence và snippet của từng strategy trên cùng Query/filter/top-k.
+- Metadata filter: lọc `buyer`, `seller` hoặc `both` trước khi retrieval.
+- Loading, empty và error states để phục vụ phần thuyết trình.
+
+### Slide thuyết trình
+
+Mở UI trước để slide cuối có thể nhúng live demo:
+
+```bash
+python ui_demo.py
+```
+
+Mở `http://localhost:8765/slides.html`. UI và slide được phục vụ bởi cùng một
+server local, nên không cần chạy thêm `python -m http.server`. Deck có 8 slide;
+dùng nút trái/phải, click vùng hai bên màn hình hoặc phím `←`/`→` để chuyển
+slide. Slide cuối nhúng trực tiếp UI cùng origin.
